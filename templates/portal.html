@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{{ hotspot_name }}</title>
+  <link rel="stylesheet" href="/static/css/style.css" />
+</head>
+<body>
+
+  <!-- Header -->
+  <header class="header">
+    <div class="wifi-icon">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white" width="40" height="40">
+        <path d="M1.75 7.18A14.4 14.4 0 0 1 12 3c3.96 0 7.55 1.6 10.25 4.18l-1.77 1.77A11.9 11.9 0 0 0 12 5.5c-3.28 0-6.27 1.32-8.48 3.45L1.75 7.18Z"/>
+        <path d="M5.31 10.74A9.4 9.4 0 0 1 12 8c2.6 0 4.95 1.05 6.69 2.74l-1.77 1.77A6.9 6.9 0 0 0 12 10.5c-1.9 0-3.63.77-4.92 2.01L5.31 10.74Z"/>
+        <path d="M8.88 14.3A4.4 4.4 0 0 1 12 13c1.22 0 2.32.5 3.12 1.3l-1.77 1.77A1.9 1.9 0 0 0 12 15.5c-.52 0-1 .21-1.35.56L8.88 14.3Z"/>
+        <circle cx="12" cy="19" r="1.5"/>
+      </svg>
+    </div>
+    <h1>{{ hotspot_name }}</h1>
+    <p>Fast &amp; reliable internet access</p>
+  </header>
+
+  <!-- Package cards -->
+  <main class="main">
+    <section class="packages">
+      <h2>Choose a Package</h2>
+      <div class="package-grid">
+        {% for pkg in packages %}
+        <button class="package-card" data-id="{{ pkg.id }}" data-price="{{ pkg.price }}" data-name="{{ pkg.name }}">
+          <span class="pkg-name">{{ pkg.name }}</span>
+          <span class="pkg-price">KES {{ pkg.price }}</span>
+          <span class="pkg-speed">{{ pkg.speed }}</span>
+        </button>
+        {% endfor %}
+      </div>
+    </section>
+
+    <!-- Payment form -->
+    <section class="payment-form" id="payment-form" style="display:none;">
+      <h2>Pay with M-Pesa</h2>
+      <div class="selected-pkg-banner" id="selected-pkg-banner"></div>
+
+      <label for="phone">M-Pesa Phone Number</label>
+      <div class="phone-input-wrap">
+        <span class="phone-prefix">+254</span>
+        <input
+          type="tel"
+          id="phone"
+          placeholder="7xx xxx xxx"
+          maxlength="9"
+          inputmode="numeric"
+          pattern="[0-9]{9}"
+        />
+      </div>
+
+      <button class="btn-pay" id="btn-pay">
+        <span id="btn-pay-text">Pay Now</span>
+        <span id="btn-pay-spinner" class="spinner" style="display:none;"></span>
+      </button>
+      <button class="btn-back" id="btn-back">&#8592; Change package</button>
+    </section>
+  </main>
+
+  <!-- Waiting overlay -->
+  <div class="overlay" id="overlay" style="display:none;">
+    <div class="overlay-card">
+      <div class="mpesa-logo">M-PESA</div>
+      <div class="big-spinner"></div>
+      <h3>Waiting for payment…</h3>
+      <p id="overlay-message">Enter your M-Pesa PIN on your phone to complete the payment.</p>
+      <button class="btn-cancel" id="btn-cancel">Cancel</button>
+    </div>
+  </div>
+
+  <!-- Success overlay -->
+  <div class="overlay overlay-success" id="overlay-success" style="display:none;">
+    <div class="overlay-card">
+      <div class="checkmark">&#10003;</div>
+      <h3>Payment Successful!</h3>
+      <p>You are now connected. Redirecting…</p>
+    </div>
+  </div>
+
+  <script>
+    const CLIENT_MAC  = "{{ client_mac }}";
+    const CLIENT_IP   = "{{ client_ip }}";
+    const NDS_TOKEN   = "{{ nds_token }}";
+    const REDIRECT_URL = "{{ redirect_url }}";
+  </script>
+  <script src="/static/js/portal.js"></script>
+</body>
+</html>

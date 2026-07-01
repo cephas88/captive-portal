@@ -1,0 +1,23 @@
+# Fly.io deployment config
+app = "captive-portal"
+primary_region = "jnb"  # Johannesburg — closest to Kenya
+
+[build]
+
+[env]
+  PORT = "8080"
+  PORTAL_PORT = "8080"
+
+[http_service]
+  internal_port = 8080
+  force_https = true
+  auto_stop_machines = false
+  auto_start_machines = true
+  min_machines_running = 1
+
+[[mounts]]
+  source = "portal_data"
+  destination = "/data"
+
+[processes]
+  app = "gunicorn app:app --bind 0.0.0.0:8080 --workers 2"
