@@ -30,6 +30,7 @@
           <span class="pkg-name">{{ pkg.name }}</span>
           <span class="pkg-price">KES {{ pkg.price }}</span>
           <span class="pkg-speed">{{ pkg.speed }}</span>
+          <span class="pkg-perhr">KES {{ (pkg.price / (pkg.duration / 60)) | round(1) }}/hr</span>
         </button>
         {% endfor %}
       </div>

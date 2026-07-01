@@ -20,7 +20,20 @@ app.config.from_object(Config)
 
 database.init_db()
 
-PACKAGES = {p["id"]: p for p in Config.PACKAGES}
+
+def get_packages():
+    """Return packages with prices calculated from the current base price."""
+    s = database.get_settings()
+    base = max(1, int(s.get("base_price") or Config.DEFAULT_BASE_PRICE))
+    result = []
+    for p in Config.PACKAGES:
+        price = max(1, round(base * p["multiplier"]))
+        result.append({**p, "price": price, "base_price": base})
+    return result
+
+
+def get_packages_dict():
+    return {p["id"]: p for p in get_packages()}
 
 
 # ── Helpers ──────────────────────────────────────────────────────────────────
@@ -74,7 +87,7 @@ def portal():
 
     return render_template(
         "portal.html",
-        packages=Config.PACKAGES,
+        packages=get_packages(),
         client_ip=client_ip,
         client_mac=client_mac,
         nds_token=nds_token,
@@ -112,6 +125,7 @@ def admin():
 def admin_setup():
     fields = [
         "hotspot_name",
+        "base_price",
         "nds_host",
         "nds_port",
         "mpesa_consumer_key",
@@ -150,10 +164,12 @@ def initiate_payment():
 
     if not phone:
         return jsonify({"error": "Phone number is required"}), 400
-    if not package_id or package_id not in PACKAGES:
+
+    packages = get_packages_dict()
+    if not package_id or package_id not in packages:
         return jsonify({"error": "Invalid package selected"}), 400
 
-    package    = PACKAGES[package_id]
+    package    = packages[package_id]
     session_id = database.create_session(
         client_mac, client_ip, nds_token, phone,
         package_id, package["price"], redirect_url,
@@ -209,7 +225,7 @@ def mpesa_callback():
             amount        = items.get("Amount", 0)
             phone         = items.get("PhoneNumber", session["phone"])
 
-            package  = PACKAGES.get(session["package_id"], {})
+            package  = get_packages_dict().get(session["package_id"], {})
             duration = package.get("duration", 60)
 
             database.mark_session_paid(session["id"], duration)

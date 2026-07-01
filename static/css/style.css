@@ -53,7 +53,8 @@ body {
 
 .pkg-name  { font-size: 1rem;  font-weight: 700; color: #1a73e8; }
 .pkg-price { font-size: 1.5rem; font-weight: 800; color: #111; }
-.pkg-speed { font-size: .78rem; color: #888; background: #e0e0e0; padding: 2px 8px; border-radius: 20px; }
+.pkg-speed  { font-size: .78rem; color: #888; background: #e0e0e0; padding: 2px 8px; border-radius: 20px; }
+.pkg-perhr  { font-size: .72rem; color: #aaa; margin-top: 2px; }
 
 .payment-form { animation: fadeIn .25s ease; }
 @keyframes fadeIn { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }

@@ -30,10 +30,16 @@ class Config:
     # Hotspot name shown on the portal
     HOTSPOT_NAME = os.environ.get("HOTSPOT_NAME", "QuickNet Hotspot")
 
-    # Data packages: id, display name, price (KES), duration (minutes), speed label
+    # Base price in KES per hour — all package prices are calculated from this.
+    # Override via admin panel or BASE_PRICE env var.
+    DEFAULT_BASE_PRICE = int(os.environ.get("BASE_PRICE", "10"))
+
+    # Packages: multiplier = how many "base price units" this package costs.
+    # price = round(base_price * multiplier)  — calculated at runtime.
     PACKAGES = [
-        {"id": "1hr",   "name": "1 Hour",  "price": 10,  "duration": 60,    "speed": "5 Mbps"},
-        {"id": "3hr",   "name": "3 Hours", "price": 25,  "duration": 180,   "speed": "5 Mbps"},
-        {"id": "1day",  "name": "1 Day",   "price": 50,  "duration": 1440,  "speed": "10 Mbps"},
-        {"id": "1week", "name": "1 Week",  "price": 200, "duration": 10080, "speed": "10 Mbps"},
+        {"id": "30min", "name": "30 Min",  "duration": 30,    "multiplier": 0.5,  "speed": "5 Mbps"},
+        {"id": "1hr",   "name": "1 Hour",  "duration": 60,    "multiplier": 1,    "speed": "5 Mbps"},
+        {"id": "3hr",   "name": "3 Hours", "duration": 180,   "multiplier": 2.5,  "speed": "5 Mbps"},
+        {"id": "1day",  "name": "1 Day",   "duration": 1440,  "multiplier": 20,   "speed": "10 Mbps"},
+        {"id": "1week", "name": "1 Week",  "duration": 10080, "multiplier": 100,  "speed": "10 Mbps"},
     ]

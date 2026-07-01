@@ -43,6 +43,13 @@
     .divider { border: none; border-top: 1px solid #e0e0e0; margin: 28px 0; }
     .tab-content { display: none; }
     .tab-content.active { display: block; }
+
+    .price-preview { background: #f0f4ff; border: 1px solid #c5d3f8; border-radius: 12px; padding: 16px; margin-top: 4px; }
+    .preview-title { font-size: .8rem; font-weight: 700; color: #1a73e8; margin-bottom: 12px; text-transform: uppercase; letter-spacing: .05em; }
+    .preview-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .preview-pkg { background: #fff; border-radius: 8px; padding: 10px 14px; display: flex; justify-content: space-between; align-items: center; }
+    .preview-pkg .pname { font-size: .85rem; color: #555; }
+    .preview-pkg .pprice { font-size: 1rem; font-weight: 800; color: #1a73e8; }
   </style>
 </head>
 <body>
@@ -103,6 +110,21 @@
       </div>
 
       <hr class="divider" />
+      <h2>Pricing</h2>
+      <p class="hint">Set your base price per hour. All package prices are calculated automatically from this single value.</p>
+      <div class="field">
+        <label>Base Price per Hour (KES)</label>
+        <input type="number" name="base_price" id="base_price" value="{{ settings.get('base_price', '10') }}" placeholder="10" min="1" />
+        <div class="hint-text">Change this and all package prices update instantly.</div>
+      </div>
+
+      <!-- Live price preview -->
+      <div class="price-preview" id="price-preview">
+        <div class="preview-title">Calculated Package Prices</div>
+        <div class="preview-grid" id="preview-grid"></div>
+      </div>
+
+      <hr class="divider" />
       <h2>Router Settings</h2>
       <p class="hint">Local IP of your WiFi router running nodogsplash. After a customer pays, their browser uses this to unlock internet access.</p>
       <div class="field">
@@ -157,6 +179,27 @@
 </div>
 
 <script>
+  // Package definitions (multipliers must match config.py)
+  var PACKAGES = [
+    { name: "30 Min",  multiplier: 0.5  },
+    { name: "1 Hour",  multiplier: 1    },
+    { name: "3 Hours", multiplier: 2.5  },
+    { name: "1 Day",   multiplier: 20   },
+    { name: "1 Week",  multiplier: 100  },
+  ];
+
+  function updatePricePreview() {
+    var base = Math.max(1, parseInt(document.getElementById('base_price').value) || 10);
+    var grid = document.getElementById('preview-grid');
+    grid.innerHTML = PACKAGES.map(function(p) {
+      var price = Math.max(1, Math.round(base * p.multiplier));
+      return '<div class="preview-pkg"><span class="pname">' + p.name + '</span><span class="pprice">KES ' + price + '</span></div>';
+    }).join('');
+  }
+
+  document.getElementById('base_price').addEventListener('input', updatePricePreview);
+  updatePricePreview(); // Show on load
+
   document.querySelectorAll('.tab').forEach(function(tab) {
     tab.addEventListener('click', function() {
       document.querySelectorAll('.tab').forEach(function(t) { t.classList.remove('active'); });
