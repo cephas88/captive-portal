@@ -114,16 +114,14 @@
       <h2>Package Prices (KES)</h2>
       <p class="hint">Set the price for each package individually. Tip: make longer packages cheaper per hour so customers are encouraged to buy more time.</p>
       <div class="pkg-price-grid">
-        {% set defaults = {'30min': 5, '1hr': 10, '3hr': 25, '1day': 100, '1week': 500} %}
-        {% set labels   = {'30min': '30 Min', '1hr': '1 Hour', '3hr': '3 Hours', '1day': '1 Day', '1week': '1 Week'} %}
-        {% for pkg_id, label in labels.items() %}
+        {% for pkg in packages %}
         <div class="pkg-price-row">
-          <label>{{ label }}</label>
+          <label>{{ pkg.name }}</label>
           <div class="pkg-price-input-wrap">
             <span class="currency">KES</span>
-            <input type="number" name="price_{{ pkg_id }}"
-                   value="{{ settings.get('price_' + pkg_id, defaults[pkg_id]) }}"
-                   min="1" placeholder="{{ defaults[pkg_id] }}" />
+            <input type="number" name="price_{{ pkg.id }}"
+                   value="{{ pkg.price }}"
+                   min="1" placeholder="{{ pkg.default_price }}" />
           </div>
         </div>
         {% endfor %}

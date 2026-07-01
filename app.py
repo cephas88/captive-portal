@@ -117,6 +117,7 @@ def admin():
         hotspot_name=hotspot_name,
         settings=masked,
         setup_complete=is_setup_complete(),
+        packages=get_packages(),
     )
 
 

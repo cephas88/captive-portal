@@ -35,7 +35,7 @@ body {
 
 .packages h2, .payment-form h2 { font-size: 1.05rem; font-weight: 600; color: #444; margin-bottom: 18px; }
 
-.package-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.package-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 
 .package-card {
   background: #f8f9fa;
