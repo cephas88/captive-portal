@@ -27,6 +27,9 @@
       <div class="package-grid">
         {% for pkg in packages %}
         <button class="package-card" data-id="{{ pkg.id }}" data-price="{{ pkg.price }}" data-name="{{ pkg.name }}">
+          {% if pkg.discount_pct > 0 %}
+          <span class="pkg-badge">Save {{ pkg.discount_pct }}%</span>
+          {% endif %}
           <span class="pkg-name">{{ pkg.name }}</span>
           <span class="pkg-price">KES {{ pkg.price }}</span>
           <span class="pkg-speed">{{ pkg.speed }}</span>

@@ -34,12 +34,13 @@ class Config:
     # Override via admin panel or BASE_PRICE env var.
     DEFAULT_BASE_PRICE = int(os.environ.get("BASE_PRICE", "10"))
 
-    # Packages: multiplier = how many "base price units" this package costs.
-    # price = round(base_price * multiplier)  — calculated at runtime.
+    # Packages: multiplier determines price = round(base_price * multiplier).
+    # Longer packages have smaller multipliers relative to duration → cheaper per hour.
+    # discount_pct shows how much cheaper per hour vs the 1hr base rate.
     PACKAGES = [
-        {"id": "30min", "name": "30 Min",  "duration": 30,    "multiplier": 0.5,  "speed": "5 Mbps"},
-        {"id": "1hr",   "name": "1 Hour",  "duration": 60,    "multiplier": 1,    "speed": "5 Mbps"},
-        {"id": "3hr",   "name": "3 Hours", "duration": 180,   "multiplier": 2.5,  "speed": "5 Mbps"},
-        {"id": "1day",  "name": "1 Day",   "duration": 1440,  "multiplier": 20,   "speed": "10 Mbps"},
-        {"id": "1week", "name": "1 Week",  "duration": 10080, "multiplier": 100,  "speed": "10 Mbps"},
+        {"id": "30min", "name": "30 Min",  "duration": 30,    "multiplier": 0.5,  "speed": "5 Mbps",  "discount_pct": 0},
+        {"id": "1hr",   "name": "1 Hour",  "duration": 60,    "multiplier": 1,    "speed": "5 Mbps",  "discount_pct": 0},
+        {"id": "3hr",   "name": "3 Hours", "duration": 180,   "multiplier": 2.5,  "speed": "5 Mbps",  "discount_pct": 17},
+        {"id": "1day",  "name": "1 Day",   "duration": 1440,  "multiplier": 15,   "speed": "10 Mbps", "discount_pct": 38},
+        {"id": "1week", "name": "1 Week",  "duration": 10080, "multiplier": 75,   "speed": "10 Mbps", "discount_pct": 55},
     ]

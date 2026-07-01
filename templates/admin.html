@@ -181,11 +181,11 @@
 <script>
   // Package definitions (multipliers must match config.py)
   var PACKAGES = [
-    { name: "30 Min",  multiplier: 0.5  },
-    { name: "1 Hour",  multiplier: 1    },
-    { name: "3 Hours", multiplier: 2.5  },
-    { name: "1 Day",   multiplier: 20   },
-    { name: "1 Week",  multiplier: 100  },
+    { name: "30 Min",  multiplier: 0.5,  discount: 0  },
+    { name: "1 Hour",  multiplier: 1,    discount: 0  },
+    { name: "3 Hours", multiplier: 2.5,  discount: 17 },
+    { name: "1 Day",   multiplier: 15,   discount: 38 },
+    { name: "1 Week",  multiplier: 75,   discount: 55 },
   ];
 
   function updatePricePreview() {
@@ -193,7 +193,8 @@
     var grid = document.getElementById('preview-grid');
     grid.innerHTML = PACKAGES.map(function(p) {
       var price = Math.max(1, Math.round(base * p.multiplier));
-      return '<div class="preview-pkg"><span class="pname">' + p.name + '</span><span class="pprice">KES ' + price + '</span></div>';
+      var badge = p.discount > 0 ? ' <span style="background:#e53935;color:#fff;font-size:.68rem;font-weight:800;padding:1px 6px;border-radius:10px;">Save ' + p.discount + '%</span>' : '';
+      return '<div class="preview-pkg"><span class="pname">' + p.name + badge + '</span><span class="pprice">KES ' + price + '</span></div>';
     }).join('');
   }
 
