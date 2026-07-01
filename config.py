@@ -30,12 +30,12 @@ class Config:
     # Hotspot name shown on the portal
     HOTSPOT_NAME = os.environ.get("HOTSPOT_NAME", "QuickNet Hotspot")
 
-    # Default prices per package — admin can override each one individually
-    # via the admin panel. Prices are stored in the database per deployment.
+    # Default prices — can be overridden by admin panel (DB) or env vars.
+    # Env var names: PRICE_30MIN, PRICE_1HR, PRICE_3HR, PRICE_1DAY, PRICE_1WEEK
     PACKAGES = [
-        {"id": "30min", "name": "30 Min",  "duration": 30,    "default_price": 5,   "speed": "5 Mbps"},
-        {"id": "1hr",   "name": "1 Hour",  "duration": 60,    "default_price": 10,  "speed": "5 Mbps"},
-        {"id": "3hr",   "name": "3 Hours", "duration": 180,   "default_price": 25,  "speed": "5 Mbps"},
-        {"id": "1day",  "name": "1 Day",   "duration": 1440,  "default_price": 100, "speed": "10 Mbps"},
-        {"id": "1week", "name": "1 Week",  "duration": 10080, "default_price": 500, "speed": "10 Mbps"},
+        {"id": "30min", "name": "30 Min",  "duration": 30,    "default_price": int(os.environ.get("PRICE_30MIN",  "5")),   "speed": "5 Mbps"},
+        {"id": "1hr",   "name": "1 Hour",  "duration": 60,    "default_price": int(os.environ.get("PRICE_1HR",   "10")),  "speed": "5 Mbps"},
+        {"id": "3hr",   "name": "3 Hours", "duration": 180,   "default_price": int(os.environ.get("PRICE_3HR",   "25")),  "speed": "5 Mbps"},
+        {"id": "1day",  "name": "1 Day",   "duration": 1440,  "default_price": int(os.environ.get("PRICE_1DAY",  "100")), "speed": "10 Mbps"},
+        {"id": "1week", "name": "1 Week",  "duration": 10080, "default_price": int(os.environ.get("PRICE_1WEEK", "500")), "speed": "10 Mbps"},
     ]
