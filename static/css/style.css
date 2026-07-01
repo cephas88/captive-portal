@@ -1,0 +1,112 @@
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: system-ui, -apple-system, sans-serif;
+  background: linear-gradient(160deg, #1a73e8 0%, #0d47a1 100%);
+  min-height: 100vh;
+  color: #333;
+}
+
+.header {
+  text-align: center;
+  padding: 36px 24px 24px;
+  color: white;
+}
+
+.wifi-icon {
+  width: 72px; height: 72px;
+  background: rgba(255,255,255,0.15);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 16px;
+  backdrop-filter: blur(4px);
+}
+
+.header h1 { font-size: 1.6rem; font-weight: 700; margin-bottom: 4px; }
+.header p  { font-size: 0.95rem; opacity: 0.85; }
+
+.main {
+  background: #fff;
+  border-radius: 24px 24px 0 0;
+  min-height: calc(100vh - 180px);
+  padding: 28px 20px 40px;
+  margin-top: 12px;
+}
+
+.packages h2, .payment-form h2 { font-size: 1.05rem; font-weight: 600; color: #444; margin-bottom: 18px; }
+
+.package-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+.package-card {
+  background: #f8f9fa;
+  border: 2px solid transparent;
+  border-radius: 16px;
+  padding: 20px 14px;
+  cursor: pointer;
+  display: flex; flex-direction: column; align-items: center; gap: 6px;
+  transition: border-color .2s, background .2s, transform .1s;
+  -webkit-tap-highlight-color: transparent;
+  width: 100%;
+}
+.package-card:active  { transform: scale(0.97); }
+.package-card.selected { border-color: #1a73e8; background: #e8f0fe; }
+
+.pkg-name  { font-size: 1rem;  font-weight: 700; color: #1a73e8; }
+.pkg-price { font-size: 1.5rem; font-weight: 800; color: #111; }
+.pkg-speed { font-size: .78rem; color: #888; background: #e0e0e0; padding: 2px 8px; border-radius: 20px; }
+
+.payment-form { animation: fadeIn .25s ease; }
+@keyframes fadeIn { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+
+.selected-pkg-banner {
+  background: #e8f0fe; border-left: 4px solid #1a73e8;
+  border-radius: 8px; padding: 12px 16px; margin-bottom: 20px;
+  font-size: .9rem; font-weight: 600; color: #1a73e8;
+}
+
+label { display: block; font-size: .85rem; font-weight: 600; color: #555; margin-bottom: 8px; }
+
+.phone-input-wrap {
+  display: flex; align-items: center;
+  border: 2px solid #ddd; border-radius: 12px; overflow: hidden;
+  margin-bottom: 20px; transition: border-color .2s;
+}
+.phone-input-wrap:focus-within { border-color: #1a73e8; }
+
+.phone-prefix { background: #f0f4f8; padding: 14px 12px; font-size: 1rem; font-weight: 600; color: #555; border-right: 2px solid #ddd; white-space: nowrap; }
+#phone { flex: 1; border: none; outline: none; padding: 14px 14px; font-size: 1.1rem; letter-spacing: .05em; color: #111; }
+
+.btn-pay {
+  width: 100%; background: #1a73e8; color: white; border: none;
+  border-radius: 14px; padding: 16px; font-size: 1.05rem; font-weight: 700;
+  cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px;
+  transition: background .2s, transform .1s; margin-bottom: 12px;
+  -webkit-tap-highlight-color: transparent;
+}
+.btn-pay:active   { transform: scale(0.98); background: #1558b0; }
+.btn-pay:disabled { background: #aaa; cursor: not-allowed; }
+
+.btn-back { width: 100%; background: transparent; border: none; color: #1a73e8; font-size: .9rem; cursor: pointer; padding: 8px; text-align: center; }
+
+.spinner { width: 18px; height: 18px; border: 2px solid rgba(255,255,255,0.4); border-top-color: white; border-radius: 50%; animation: spin .7s linear infinite; }
+.big-spinner { width: 56px; height: 56px; border: 4px solid #e8f0fe; border-top-color: #1a73e8; border-radius: 50%; animation: spin .9s linear infinite; margin: 20px auto; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.55);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 100; padding: 20px; animation: fadeIn .2s ease;
+}
+.overlay-card { background: white; border-radius: 24px; padding: 36px 28px; text-align: center; width: 100%; max-width: 340px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+.mpesa-logo { background: #00a651; color: white; font-size: 1.1rem; font-weight: 900; letter-spacing: .1em; padding: 8px 20px; border-radius: 8px; display: inline-block; margin-bottom: 4px; }
+.overlay-card h3 { font-size: 1.15rem; margin-bottom: 10px; color: #111; }
+.overlay-card p  { font-size: .88rem; color: #666; line-height: 1.5; margin-bottom: 20px; }
+.btn-cancel { background: transparent; border: 2px solid #ddd; border-radius: 10px; padding: 10px 28px; font-size: .9rem; color: #555; cursor: pointer; }
+
+.overlay-success .overlay-card { background: #e8f0fe; }
+.checkmark { width: 70px; height: 70px; background: #1a73e8; color: white; font-size: 2.5rem; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; }
+
+@media (min-width: 480px) {
+  .main { max-width: 420px; margin: 12px auto 0; border-radius: 24px; min-height: unset; }
+  body { padding-bottom: 40px; }
+}

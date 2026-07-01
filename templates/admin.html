@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin — {{ hotspot_name }}</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: system-ui, sans-serif; background: #f0f4f8; color: #333; font-size: 14px; }
+    .topbar { background: #1a73e8; color: #fff; padding: 14px 24px; display: flex; justify-content: space-between; align-items: center; }
+    .topbar h1 { font-size: 1.1rem; font-weight: 700; }
+    .setup-warn { background: #ff6d00; color: #fff; text-align: center; padding: 10px; font-size: .85rem; font-weight: 600; }
+    .tabs { display: flex; background: #fff; border-bottom: 2px solid #e0e0e0; padding: 0 24px; }
+    .tab { padding: 14px 20px; cursor: pointer; color: #777; font-weight: 600; font-size: .88rem; border-bottom: 3px solid transparent; margin-bottom: -2px; transition: color .2s; }
+    .tab.active { color: #1a73e8; border-bottom-color: #1a73e8; }
+    .stats { display: flex; gap: 14px; padding: 20px 24px; flex-wrap: wrap; }
+    .stat { background: #fff; border-radius: 12px; padding: 18px 24px; flex: 1; min-width: 130px; box-shadow: 0 2px 6px rgba(0,0,0,.07); }
+    .stat .label { font-size: .75rem; color: #888; text-transform: uppercase; letter-spacing: .05em; }
+    .stat .value { font-size: 1.8rem; font-weight: 800; color: #1a73e8; margin-top: 4px; }
+    .section { padding: 0 24px 40px; overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 6px rgba(0,0,0,.07); }
+    th { background: #1a73e8; color: #fff; padding: 11px 14px; text-align: left; font-weight: 600; white-space: nowrap; }
+    td { padding: 10px 14px; border-bottom: 1px solid #f0f0f0; white-space: nowrap; }
+    tr:last-child td { border-bottom: none; }
+    .badge { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: .75rem; font-weight: 600; }
+    .badge-paid    { background: #e6f4ea; color: #2e7d32; }
+    .badge-pending { background: #fff8e1; color: #f57f17; }
+    .badge-failed  { background: #fce8e6; color: #c62828; }
+    .badge-expired { background: #eeeeee; color: #555; }
+    .setup-section { padding: 24px; max-width: 560px; }
+    .setup-section h2 { font-size: 1rem; color: #444; margin-bottom: 6px; }
+    .setup-section p.hint { font-size: .82rem; color: #888; margin-bottom: 22px; line-height: 1.5; }
+    .field { margin-bottom: 16px; }
+    .field label { display: block; font-size: .82rem; font-weight: 600; color: #555; margin-bottom: 5px; }
+    .field input, .field select { width: 100%; border: 2px solid #ddd; border-radius: 10px; padding: 10px 14px; font-size: .95rem; outline: none; transition: border-color .2s; }
+    .field input:focus, .field select:focus { border-color: #1a73e8; }
+    .field .hint-text { font-size: .75rem; color: #999; margin-top: 4px; }
+    .btn-save { background: #1a73e8; color: #fff; border: none; border-radius: 10px; padding: 12px 28px; font-size: .95rem; font-weight: 700; cursor: pointer; margin-top: 8px; }
+    .btn-save:disabled { background: #aaa; }
+    .save-msg { margin-top: 12px; padding: 10px 16px; border-radius: 8px; font-size: .85rem; font-weight: 600; display: none; }
+    .save-msg.ok  { background: #e6f4ea; color: #2e7d32; display: block; }
+    .save-msg.err { background: #fce8e6; color: #c62828; display: block; }
+    .divider { border: none; border-top: 1px solid #e0e0e0; margin: 28px 0; }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+  </style>
+</head>
+<body>
+
+{% if not setup_complete %}
+<div class="setup-warn">M-Pesa is not configured yet. Go to the Setup tab to enter your credentials.</div>
+{% endif %}
+
+<div class="topbar">
+  <h1>{{ hotspot_name }} — Admin</h1>
+  <span>{{ sessions | length }} sessions</span>
+</div>
+
+<div class="tabs">
+  <div class="tab active" data-tab="dashboard">Dashboard</div>
+  <div class="tab" data-tab="setup">Setup / Credentials</div>
+</div>
+
+<!-- Dashboard tab -->
+<div class="tab-content active" id="tab-dashboard">
+  <div class="stats">
+    <div class="stat"><div class="label">Total Revenue</div><div class="value">KES {{ "%.0f"|format(total_revenue) }}</div></div>
+    <div class="stat"><div class="label">Today</div><div class="value">KES {{ "%.0f"|format(today_revenue) }}</div></div>
+    <div class="stat"><div class="label">Sessions</div><div class="value">{{ sessions | length }}</div></div>
+    <div class="stat"><div class="label">Active</div><div class="value">{{ sessions | selectattr('status', 'equalto', 'paid') | list | length }}</div></div>
+  </div>
+  <div class="section">
+    <table>
+      <thead>
+        <tr><th>Time</th><th>Phone</th><th>Package</th><th>Amount</th><th>Device MAC</th><th>Status</th><th>Expires</th></tr>
+      </thead>
+      <tbody>
+        {% for s in sessions %}
+        <tr>
+          <td>{{ s.created_at[:16] }}</td>
+          <td>{{ s.phone }}</td>
+          <td>{{ s.package_id }}</td>
+          <td>KES {{ s.amount | int }}</td>
+          <td style="font-family:monospace;">{{ s.client_mac }}</td>
+          <td><span class="badge badge-{{ s.status }}">{{ s.status }}</span></td>
+          <td>{{ (s.expires_at or '')[:16] }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Setup tab -->
+<div class="tab-content" id="tab-setup">
+  <div class="setup-section">
+    <h2>Hotspot Branding</h2>
+    <p class="hint">Name shown on the portal page your customers see.</p>
+    <form id="setup-form">
+      <div class="field">
+        <label>Hotspot Name</label>
+        <input type="text" name="hotspot_name" value="{{ settings.get('hotspot_name', '') }}" placeholder="e.g. Sunrise Cafe WiFi" />
+      </div>
+
+      <hr class="divider" />
+      <h2>Router Settings</h2>
+      <p class="hint">Local IP of your WiFi router running nodogsplash. After a customer pays, their browser uses this to unlock internet access.</p>
+      <div class="field">
+        <label>Router IP Address</label>
+        <input type="text" name="nds_host" value="{{ settings.get('nds_host', '192.168.1.1') }}" placeholder="192.168.1.1" />
+        <div class="hint-text">Check the sticker on the back of your router.</div>
+      </div>
+      <div class="field">
+        <label>nodogsplash Port</label>
+        <input type="text" name="nds_port" value="{{ settings.get('nds_port', '2050') }}" placeholder="2050" />
+        <div class="hint-text">Leave as 2050 unless you changed it.</div>
+      </div>
+
+      <hr class="divider" />
+      <h2>M-Pesa Daraja Credentials</h2>
+      <p class="hint">Get these from <strong>developer.safaricom.co.ke</strong> → My Apps. Each operator uses their own shortcode so payments go directly to their account.</p>
+      <div class="field">
+        <label>Consumer Key</label>
+        <input type="text" name="mpesa_consumer_key" value="{{ settings.get('mpesa_consumer_key', '') }}" placeholder="From Daraja portal" />
+      </div>
+      <div class="field">
+        <label>Consumer Secret</label>
+        <input type="password" name="mpesa_consumer_secret" placeholder="Leave blank to keep existing" />
+        <div class="hint-text">Leave blank to keep the current saved value.</div>
+      </div>
+      <div class="field">
+        <label>Business Shortcode (PayBill number)</label>
+        <input type="text" name="mpesa_shortcode" value="{{ settings.get('mpesa_shortcode', '') }}" placeholder="e.g. 174379" />
+      </div>
+      <div class="field">
+        <label>Lipa Na M-Pesa Passkey</label>
+        <input type="password" name="mpesa_passkey" placeholder="Leave blank to keep existing" />
+        <div class="hint-text">Leave blank to keep the current saved value.</div>
+      </div>
+      <div class="field">
+        <label>Callback URL (your server or ngrok URL)</label>
+        <input type="text" name="mpesa_callback_url" value="{{ settings.get('mpesa_callback_url', '') }}" placeholder="https://cephas-captive-portal.fly.dev" />
+        <div class="hint-text">Paste your server URL — the system adds <code>/mpesa-callback</code> automatically.</div>
+      </div>
+      <div class="field">
+        <label>Environment</label>
+        <select name="mpesa_base_url">
+          <option value="https://sandbox.safaricom.co.ke" {% if 'sandbox' in settings.get('mpesa_base_url','') %}selected{% endif %}>Sandbox (testing)</option>
+          <option value="https://api.safaricom.co.ke" {% if settings.get('mpesa_base_url','') == 'https://api.safaricom.co.ke' %}selected{% endif %}>Production (live — real money)</option>
+        </select>
+      </div>
+
+      <button type="submit" class="btn-save" id="btn-save">Save Settings</button>
+      <div class="save-msg" id="save-msg"></div>
+    </form>
+  </div>
+</div>
+
+<script>
+  document.querySelectorAll('.tab').forEach(function(tab) {
+    tab.addEventListener('click', function() {
+      document.querySelectorAll('.tab').forEach(function(t) { t.classList.remove('active'); });
+      document.querySelectorAll('.tab-content').forEach(function(c) { c.classList.remove('active'); });
+      tab.classList.add('active');
+      document.getElementById('tab-' + tab.dataset.tab).classList.add('active');
+    });
+  });
+
+  {% if not setup_complete %}
+  document.querySelector('[data-tab="setup"]').click();
+  {% endif %}
+
+  document.getElementById('setup-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    var btn = document.getElementById('btn-save');
+    var msg = document.getElementById('save-msg');
+    btn.disabled = true;
+    btn.textContent = 'Saving…';
+    fetch('/admin/setup', { method: 'POST', body: new FormData(this) })
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
+        btn.disabled = false;
+        btn.textContent = 'Save Settings';
+        msg.className = 'save-msg ok';
+        msg.textContent = (data.message || 'Saved.') + (data.callback_url ? ' Callback: ' + data.callback_url : '');
+        setTimeout(function() { msg.className = 'save-msg'; }, 8000);
+      })
+      .catch(function() {
+        btn.disabled = false;
+        btn.textContent = 'Save Settings';
+        msg.className = 'save-msg err';
+        msg.textContent = 'Save failed. Check the server.';
+      });
+  });
+</script>
+</body>
+</html>
