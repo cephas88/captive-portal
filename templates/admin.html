@@ -44,12 +44,13 @@
     .tab-content { display: none; }
     .tab-content.active { display: block; }
 
-    .price-preview { background: #f0f4ff; border: 1px solid #c5d3f8; border-radius: 12px; padding: 16px; margin-top: 4px; }
-    .preview-title { font-size: .8rem; font-weight: 700; color: #1a73e8; margin-bottom: 12px; text-transform: uppercase; letter-spacing: .05em; }
-    .preview-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-    .preview-pkg { background: #fff; border-radius: 8px; padding: 10px 14px; display: flex; justify-content: space-between; align-items: center; }
-    .preview-pkg .pname { font-size: .85rem; color: #555; }
-    .preview-pkg .pprice { font-size: 1rem; font-weight: 800; color: #1a73e8; }
+    .pkg-price-grid { display: flex; flex-direction: column; gap: 10px; margin-bottom: 4px; }
+    .pkg-price-row { display: flex; align-items: center; justify-content: space-between; background: #f8f9fa; border-radius: 10px; padding: 10px 14px; }
+    .pkg-price-row label { font-size: .9rem; font-weight: 600; color: #444; margin: 0; }
+    .pkg-price-input-wrap { display: flex; align-items: center; border: 2px solid #ddd; border-radius: 8px; overflow: hidden; background: #fff; }
+    .pkg-price-input-wrap:focus-within { border-color: #1a73e8; }
+    .currency { padding: 7px 10px; background: #f0f4f8; font-size: .85rem; font-weight: 600; color: #555; border-right: 1px solid #ddd; }
+    .pkg-price-input-wrap input { border: none; outline: none; width: 80px; padding: 7px 10px; font-size: .95rem; font-weight: 700; color: #111; }
   </style>
 </head>
 <body>
@@ -110,18 +111,22 @@
       </div>
 
       <hr class="divider" />
-      <h2>Pricing</h2>
-      <p class="hint">Set your base price per hour. All package prices are calculated automatically from this single value.</p>
-      <div class="field">
-        <label>Base Price per Hour (KES)</label>
-        <input type="number" name="base_price" id="base_price" value="{{ settings.get('base_price', '10') }}" placeholder="10" min="1" />
-        <div class="hint-text">Change this and all package prices update instantly.</div>
-      </div>
-
-      <!-- Live price preview -->
-      <div class="price-preview" id="price-preview">
-        <div class="preview-title">Calculated Package Prices</div>
-        <div class="preview-grid" id="preview-grid"></div>
+      <h2>Package Prices (KES)</h2>
+      <p class="hint">Set the price for each package individually. Tip: make longer packages cheaper per hour so customers are encouraged to buy more time.</p>
+      <div class="pkg-price-grid">
+        {% set defaults = {'30min': 5, '1hr': 10, '3hr': 25, '1day': 100, '1week': 500} %}
+        {% set labels   = {'30min': '30 Min', '1hr': '1 Hour', '3hr': '3 Hours', '1day': '1 Day', '1week': '1 Week'} %}
+        {% for pkg_id, label in labels.items() %}
+        <div class="pkg-price-row">
+          <label>{{ label }}</label>
+          <div class="pkg-price-input-wrap">
+            <span class="currency">KES</span>
+            <input type="number" name="price_{{ pkg_id }}"
+                   value="{{ settings.get('price_' + pkg_id, defaults[pkg_id]) }}"
+                   min="1" placeholder="{{ defaults[pkg_id] }}" />
+          </div>
+        </div>
+        {% endfor %}
       </div>
 
       <hr class="divider" />
@@ -179,28 +184,6 @@
 </div>
 
 <script>
-  // Package definitions (multipliers must match config.py)
-  var PACKAGES = [
-    { name: "30 Min",  multiplier: 0.5,  discount: 0  },
-    { name: "1 Hour",  multiplier: 1,    discount: 0  },
-    { name: "3 Hours", multiplier: 2.5,  discount: 17 },
-    { name: "1 Day",   multiplier: 15,   discount: 38 },
-    { name: "1 Week",  multiplier: 75,   discount: 55 },
-  ];
-
-  function updatePricePreview() {
-    var base = Math.max(1, parseInt(document.getElementById('base_price').value) || 10);
-    var grid = document.getElementById('preview-grid');
-    grid.innerHTML = PACKAGES.map(function(p) {
-      var price = Math.max(1, Math.round(base * p.multiplier));
-      var badge = p.discount > 0 ? ' <span style="background:#e53935;color:#fff;font-size:.68rem;font-weight:800;padding:1px 6px;border-radius:10px;">Save ' + p.discount + '%</span>' : '';
-      return '<div class="preview-pkg"><span class="pname">' + p.name + badge + '</span><span class="pprice">KES ' + price + '</span></div>';
-    }).join('');
-  }
-
-  document.getElementById('base_price').addEventListener('input', updatePricePreview);
-  updatePricePreview(); // Show on load
-
   document.querySelectorAll('.tab').forEach(function(tab) {
     tab.addEventListener('click', function() {
       document.querySelectorAll('.tab').forEach(function(t) { t.classList.remove('active'); });

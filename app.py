@@ -22,13 +22,12 @@ database.init_db()
 
 
 def get_packages():
-    """Return packages with prices calculated from the current base price."""
+    """Return packages with prices loaded from admin settings (falls back to defaults)."""
     s = database.get_settings()
-    base = max(1, int(s.get("base_price") or Config.DEFAULT_BASE_PRICE))
     result = []
     for p in Config.PACKAGES:
-        price = max(1, round(base * p["multiplier"]))
-        result.append({**p, "price": price, "base_price": base})
+        price = int(s.get(f"price_{p['id']}") or p["default_price"])
+        result.append({**p, "price": price})
     return result
 
 
@@ -125,7 +124,6 @@ def admin():
 def admin_setup():
     fields = [
         "hotspot_name",
-        "base_price",
         "nds_host",
         "nds_port",
         "mpesa_consumer_key",
@@ -134,7 +132,7 @@ def admin_setup():
         "mpesa_passkey",
         "mpesa_callback_url",
         "mpesa_base_url",
-    ]
+    ] + [f"price_{p['id']}" for p in Config.PACKAGES]
     data = {f: request.form.get(f, "").strip() for f in fields}
 
     if data.get("mpesa_callback_url"):

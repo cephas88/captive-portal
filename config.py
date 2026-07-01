@@ -30,17 +30,12 @@ class Config:
     # Hotspot name shown on the portal
     HOTSPOT_NAME = os.environ.get("HOTSPOT_NAME", "QuickNet Hotspot")
 
-    # Base price in KES per hour — all package prices are calculated from this.
-    # Override via admin panel or BASE_PRICE env var.
-    DEFAULT_BASE_PRICE = int(os.environ.get("BASE_PRICE", "10"))
-
-    # Packages: multiplier determines price = round(base_price * multiplier).
-    # Longer packages have smaller multipliers relative to duration → cheaper per hour.
-    # discount_pct shows how much cheaper per hour vs the 1hr base rate.
+    # Default prices per package — admin can override each one individually
+    # via the admin panel. Prices are stored in the database per deployment.
     PACKAGES = [
-        {"id": "30min", "name": "30 Min",  "duration": 30,    "multiplier": 0.5,  "speed": "5 Mbps",  "discount_pct": 0},
-        {"id": "1hr",   "name": "1 Hour",  "duration": 60,    "multiplier": 1,    "speed": "5 Mbps",  "discount_pct": 0},
-        {"id": "3hr",   "name": "3 Hours", "duration": 180,   "multiplier": 2.5,  "speed": "5 Mbps",  "discount_pct": 17},
-        {"id": "1day",  "name": "1 Day",   "duration": 1440,  "multiplier": 15,   "speed": "10 Mbps", "discount_pct": 38},
-        {"id": "1week", "name": "1 Week",  "duration": 10080, "multiplier": 75,   "speed": "10 Mbps", "discount_pct": 55},
+        {"id": "30min", "name": "30 Min",  "duration": 30,    "default_price": 5,   "speed": "5 Mbps"},
+        {"id": "1hr",   "name": "1 Hour",  "duration": 60,    "default_price": 10,  "speed": "5 Mbps"},
+        {"id": "3hr",   "name": "3 Hours", "duration": 180,   "default_price": 25,  "speed": "5 Mbps"},
+        {"id": "1day",  "name": "1 Day",   "duration": 1440,  "default_price": 100, "speed": "10 Mbps"},
+        {"id": "1week", "name": "1 Week",  "duration": 10080, "default_price": 500, "speed": "10 Mbps"},
     ]
