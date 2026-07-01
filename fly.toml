@@ -1,6 +1,6 @@
 # Fly.io deployment config
-app = "captive-portal"
-primary_region = "jnb"  # Johannesburg — closest to Kenya
+app = "cephas-captive-portal"
+primary_region = "jnb"
 
 [build]
 
@@ -18,6 +18,3 @@ primary_region = "jnb"  # Johannesburg — closest to Kenya
 [[mounts]]
   source = "portal_data"
   destination = "/data"
-
-[processes]
-  app = "gunicorn app:app --bind 0.0.0.0:8080 --workers 2"
